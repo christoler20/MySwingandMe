@@ -1,0 +1,13 @@
+# ─────────────────────────────────────────────────────────────
+# SwingDx — system (apt-get) packages for Streamlit Community Cloud
+#
+# SwingDx does not currently require any system-level packages.
+# This file is intentionally left with only comments.
+#
+# Streamlit Cloud runs on Debian Linux. If a future dependency
+# needs a system library, add ONE package name per line below
+# (no comments on the same line as a package). Example:
+#
+# libgl1
+# ffmpeg
+# ─────────────────────────────────────────────────────────────

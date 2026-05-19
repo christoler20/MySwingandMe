@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────
+# SwingDx — .gitignore
+# Keeps secrets, caches, and local junk OUT of your repository.
+# ─────────────────────────────────────────────────────────────
+
+# ── SECRETS — never commit these ──
+.streamlit/secrets.toml
+.env
+.env.*
+*.key
+secrets.toml
+
+# ── Python cache & build artifacts ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ── Virtual environments ──
+venv/
+.venv/
+env/
+ENV/
+.virtualenv/
+
+# ── OS / editor files ──
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# ── Jupyter / notebooks ──
+.ipynb_checkpoints/
+
+# ── Logs & temp files ──
+*.log
+tmp/
+temp/
+.cache/
+
+# ── Test & coverage ──
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── User-uploaded media (don't commit test swing videos/images) ──
+uploads/
+*.mp4
+*.mov
+*.webm

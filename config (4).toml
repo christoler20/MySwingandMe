@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────────────────────────
+# SwingDx — Streamlit configuration
+# Place this file at:  .streamlit/config.toml
+# ─────────────────────────────────────────────────────────────
+
+[theme]
+# Dark mode — matches SwingDx brand palette
+base                    = "dark"
+primaryColor            = "#4ADE80"   # lime green — buttons & accents
+backgroundColor         = "#080E1A"   # deep navy — main background
+secondaryBackgroundColor = "#0D1829"  # card / sidebar background
+textColor               = "#F0EBE0"  # warm cream — body text
+font                    = "sans serif"
+
+[server]
+# Max file size (MB) for swing photo/video uploads
+maxUploadSize           = 200
+# Keep the app responsive; disable usage stats collection
+enableXsrfProtection    = true
+enableCORS              = false
+
+[browser]
+# Don't gather usage statistics
+gatherUsageStats        = false
+
+[client]
+# Hide deploy/error details from end users in production
+showErrorDetails        = false
+toolbarMode             = "minimal"
+
+[runner]
+# Re-run the script automatically when source changes (dev convenience)
+fastReruns              = true
