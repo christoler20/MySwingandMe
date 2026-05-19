@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MySwing and Me · Video Player</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #080E1A; --card: #0D1829; --border: #1A2D4A;
+    --lime: #4ADE80; --gold: #F59E0B; --cream: #F0EBE0;
+    --muted: #6B8BAF; --danger: #EF4444; --coach: #A855F7;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--night);
+    color: var(--cream);
+    font-family: 'Barlow', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .player-wrap {
+    display: flex; flex-direction: column;
+    background: var(--night);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .video-container {
+    background: #000;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    display: flex; align-items: center; justify-content: center;
+  }
+  video {
+    width: 100%; height: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+    cursor: pointer;
+  }
+  .upload-prompt {
+    color: var(--muted);
+    text-align: center;
+    padding: 2rem;
+  }
+  .upload-prompt h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.08em;
+  }
+  .file-input {
+    margin-top: 1rem;
+    background: var(--card);
+    color: var(--cream);
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.9rem;
+  }
+
+  .playback-bar {
+    background: linear-gradient(180deg, var(--card) 0%, var(--night) 100%);
+    padding: 0.7rem 1rem 0.9rem;
+  }
+  .timeline-row {
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+  .time-display {
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--gold);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    min-width: 3.3rem;
+    text-align: center;
+  }
+  .scrubber {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+  .scrubber::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px; height: 16px;
+    background: var(--gold);
+    border-radius: 50%;
+    border: 2px solid var(--cream);
+    cursor: pointer;
+  }
+  .scrubber::-moz-range-thumb {
+    width: 16px; height: 16px;
+    background: var(--gold);
+    border-radius: 50%;
+    border: 2px solid var(--cream);
+    cursor: pointer;
+  }
+
+  .transport-row {
+    display: flex; align-items: center;
+    justify-content: center; gap: 0.5rem;
+    margin-bottom: 0.7rem;
+  }
+  .btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--cream);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:active { transform: scale(0.92); }
+  .btn:hover { border-color: var(--gold); color: var(--gold); }
+  .btn.play {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--gold), #D97706);
+    color: var(--night);
+    border: none;
+    font-size: 1.2rem;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+  }
+  .btn.play:hover {
+    background: linear-gradient(135deg, #FBBF24, var(--gold));
+    color: var(--night);
+  }
+  .btn.active {
+    border-color: var(--lime);
+    color: var(--lime);
+    background: rgba(74, 222, 128, 0.1);
+  }
+
+  .speed-row {
+    display: flex; align-items: center;
+    gap: 0.5rem; justify-content: center;
+  }
+  .speed-label {
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+  }
+  .speed-pills {
+    display: flex; gap: 0.25rem;
+  }
+  .speed-pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.32rem 0.6rem;
+    border-radius: 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .speed-pill:active { transform: scale(0.94); }
+  .speed-pill.active {
+    background: var(--lime);
+    color: var(--night);
+    border-color: var(--lime);
+  }
+  .hint {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+<div class="player-wrap">
+  <div class="video-container" id="videoContainer">
+    <div class="upload-prompt" id="uploadPrompt">
+      <h3>🎬 Swing Review Player</h3>
+      <p>Load a video to enable slow-motion playback, frame stepping, and scrubbing.</p>
+      <input type="file" accept="video/*" class="file-input" id="fileInput">
+    </div>
+    <video id="vid" playsinline style="display:none;"></video>
+  </div>
+
+  <div class="playback-bar" id="controls" style="display:none;">
+    <div class="timeline-row">
+      <span class="time-display" id="curTime">0:00.0</span>
+      <input type="range" class="scrubber" id="scrubber" min="0" max="100" step="0.1" value="0">
+      <span class="time-display" id="dur">0:00.0</span>
+    </div>
+    <div class="transport-row">
+      <button class="btn" id="stepBack" title="Frame back">⏮</button>
+      <button class="btn" id="stopBtn" title="Stop">⏹</button>
+      <button class="btn play" id="playBtn" title="Play/Pause">▶</button>
+      <button class="btn" id="loopBtn" title="Loop">🔁</button>
+      <button class="btn" id="stepFwd" title="Frame forward">⏭</button>
+    </div>
+    <div class="speed-row">
+      <span class="speed-label">SPEED</span>
+      <div class="speed-pills">
+        <button class="speed-pill" data-speed="0.1">0.1×</button>
+        <button class="speed-pill" data-speed="0.25">0.25×</button>
+        <button class="speed-pill" data-speed="0.5">0.5×</button>
+        <button class="speed-pill active" data-speed="1">1×</button>
+        <button class="speed-pill" data-speed="2">2×</button>
+      </div>
+    </div>
+    <div class="hint">⌨ Space = play/pause · ← → = frame · ↑ ↓ = speed</div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const vid = $('vid');
+const FRAME_TIME = 1 / 30;
+let isScrubbing = false;
+
+$('fileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  vid.src = URL.createObjectURL(file);
+  $('uploadPrompt').style.display = 'none';
+  vid.style.display = 'block';
+  $('controls').style.display = 'block';
+});
+
+function formatTime(s) {
+  if (!isFinite(s)) return '0:00.0';
+  const mm = Math.floor(s / 60);
+  const ss = (s % 60).toFixed(1);
+  return `${mm}:${ss.padStart(4, '0')}`;
+}
+
+$('playBtn').addEventListener('click', () => {
+  if (vid.paused) vid.play(); else vid.pause();
+});
+vid.addEventListener('play', () => $('playBtn').textContent = '❚❚');
+vid.addEventListener('pause', () => $('playBtn').textContent = '▶');
+vid.addEventListener('click', () => {
+  if (vid.paused) vid.play(); else vid.pause();
+});
+
+$('stopBtn').addEventListener('click', () => {
+  vid.pause();
+  vid.currentTime = 0;
+});
+
+$('stepBack').addEventListener('click', () => {
+  vid.pause();
+  vid.currentTime = Math.max(0, vid.currentTime - FRAME_TIME);
+});
+
+$('stepFwd').addEventListener('click', () => {
+  vid.pause();
+  vid.currentTime = Math.min(vid.duration || 0, vid.currentTime + FRAME_TIME);
+});
+
+$('loopBtn').addEventListener('click', () => {
+  vid.loop = !vid.loop;
+  $('loopBtn').classList.toggle('active', vid.loop);
+});
+
+document.querySelectorAll('.speed-pill').forEach(p => {
+  p.addEventListener('click', () => {
+    vid.playbackRate = parseFloat(p.dataset.speed);
+    document.querySelectorAll('.speed-pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+  });
+});
+
+const scrubber = $('scrubber');
+scrubber.addEventListener('input', () => {
+  isScrubbing = true;
+  if (vid.duration) {
+    vid.currentTime = (parseFloat(scrubber.value) / 100) * vid.duration;
+  }
+});
+scrubber.addEventListener('change', () => { isScrubbing = false; });
+
+vid.addEventListener('timeupdate', () => {
+  if (isScrubbing) return;
+  $('curTime').textContent = formatTime(vid.currentTime);
+  if (vid.duration) {
+    scrubber.value = (vid.currentTime / vid.duration) * 100;
+  }
+});
+
+vid.addEventListener('loadedmetadata', () => {
+  $('dur').textContent = formatTime(vid.duration);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  switch(e.key) {
+    case ' ':
+      e.preventDefault();
+      if (vid.paused) vid.play(); else vid.pause();
+      break;
+    case 'ArrowLeft': e.preventDefault(); $('stepBack').click(); break;
+    case 'ArrowRight': e.preventDefault(); $('stepFwd').click(); break;
+    case 'ArrowUp': e.preventDefault(); cycleSpeed(1); break;
+    case 'ArrowDown': e.preventDefault(); cycleSpeed(-1); break;
+  }
+});
+
+function cycleSpeed(d) {
+  const speeds = [0.1, 0.25, 0.5, 1, 2];
+  let idx = speeds.indexOf(vid.playbackRate);
+  if (idx < 0) idx = 3;
+  idx = Math.max(0, Math.min(speeds.length - 1, idx + d));
+  vid.playbackRate = speeds[idx];
+  document.querySelectorAll('.speed-pill').forEach(p => {
+    p.classList.toggle('active', parseFloat(p.dataset.speed) === speeds[idx]);
+  });
+}
+</script>
+</body>
+</html>
